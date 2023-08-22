@@ -2,6 +2,7 @@ package com.dantsu.escposprinter;
 
 import android.graphics.Bitmap;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -9,7 +10,6 @@ import java.util.EnumMap;
 import com.dantsu.escposprinter.barcode.Barcode;
 import com.dantsu.escposprinter.connection.DeviceConnection;
 import com.dantsu.escposprinter.exceptions.EscPosBarcodeException;
-import com.dantsu.escposprinter.exceptions.EscPosConnectionException;
 import com.dantsu.escposprinter.exceptions.EscPosEncodingException;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -306,7 +306,7 @@ public class EscPosPrinterCommands {
     /**
      * Start socket connection and open stream with the device.
      */
-    public EscPosPrinterCommands connect() throws EscPosConnectionException {
+    public EscPosPrinterCommands connect() throws IOException {
         this.printerConnection.connect();
         return this;
     }
@@ -509,35 +509,34 @@ public class EscPosPrinterCommands {
         return this;
     }
 
-    public EscPosPrinterCommands printAllCharsetsEncodingCharacters() {
+    public EscPosPrinterCommands printAllCharsetsEncodingCharacters() throws IOException, InterruptedException {
         for (int charsetId = 0; charsetId < 256; ++charsetId) {
             this.printCharsetEncodingCharacters(charsetId);
         }
         return this;
     }
 
-    public EscPosPrinterCommands printCharsetsEncodingCharacters(int[] charsetsId) {
+    public EscPosPrinterCommands printCharsetsEncodingCharacters(int[] charsetsId) throws IOException, InterruptedException {
         for (int charsetId : charsetsId) {
             this.printCharsetEncodingCharacters(charsetId);
         }
         return this;
     }
 
-    public EscPosPrinterCommands printCharsetEncodingCharacters(int charsetId) {
+    public EscPosPrinterCommands printCharsetEncodingCharacters(int charsetId) throws IOException, InterruptedException {
         if (!this.printerConnection.isConnected()) {
             return this;
         }
 
-        try {
-            this.printerConnection.write(new byte[]{0x1B, 0x74, (byte) charsetId});
-            this.printerConnection.write(EscPosPrinterCommands.TEXT_SIZE_NORMAL);
-            this.printerConnection.write(EscPosPrinterCommands.TEXT_COLOR_BLACK);
-            this.printerConnection.write(EscPosPrinterCommands.TEXT_COLOR_REVERSE_OFF);
-            this.printerConnection.write(EscPosPrinterCommands.TEXT_WEIGHT_NORMAL);
-            this.printerConnection.write(EscPosPrinterCommands.TEXT_UNDERLINE_OFF);
-            this.printerConnection.write(EscPosPrinterCommands.TEXT_DOUBLE_STRIKE_OFF);
-            this.printerConnection.write((":::: Charset n°" + charsetId + " : ").getBytes());
-            this.printerConnection.write(new byte[]{
+        this.printerConnection.write(new byte[]{0x1B, 0x74, (byte) charsetId});
+        this.printerConnection.write(EscPosPrinterCommands.TEXT_SIZE_NORMAL);
+        this.printerConnection.write(EscPosPrinterCommands.TEXT_COLOR_BLACK);
+        this.printerConnection.write(EscPosPrinterCommands.TEXT_COLOR_REVERSE_OFF);
+        this.printerConnection.write(EscPosPrinterCommands.TEXT_WEIGHT_NORMAL);
+        this.printerConnection.write(EscPosPrinterCommands.TEXT_UNDERLINE_OFF);
+        this.printerConnection.write(EscPosPrinterCommands.TEXT_DOUBLE_STRIKE_OFF);
+        this.printerConnection.write((":::: Charset n°" + charsetId + " : ").getBytes());
+        this.printerConnection.write(new byte[]{
                 (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05, (byte) 0x06, (byte) 0x07, (byte) 0x08, (byte) 0x09, (byte) 0x0A, (byte) 0x0B, (byte) 0x0C, (byte) 0x0D, (byte) 0x0E, (byte) 0x0F,
                 (byte) 0x10, (byte) 0x11, (byte) 0x12, (byte) 0x13, (byte) 0x14, (byte) 0x15, (byte) 0x16, (byte) 0x17, (byte) 0x18, (byte) 0x19, (byte) 0x1A, (byte) 0x1B, (byte) 0x1C, (byte) 0x1D, (byte) 0x1E, (byte) 0x1F,
                 (byte) 0x20, (byte) 0x21, (byte) 0x22, (byte) 0x23, (byte) 0x24, (byte) 0x25, (byte) 0x26, (byte) 0x27, (byte) 0x28, (byte) 0x29, (byte) 0x2A, (byte) 0x2B, (byte) 0x2C, (byte) 0x2D, (byte) 0x2E, (byte) 0x2F,
@@ -554,12 +553,10 @@ public class EscPosPrinterCommands {
                 (byte) 0xD0, (byte) 0xD1, (byte) 0xD2, (byte) 0xD3, (byte) 0xD4, (byte) 0xD5, (byte) 0xD6, (byte) 0xD7, (byte) 0xD8, (byte) 0xD9, (byte) 0xDA, (byte) 0xDB, (byte) 0xDC, (byte) 0xDD, (byte) 0xDE, (byte) 0xDF,
                 (byte) 0xE0, (byte) 0xE1, (byte) 0xE2, (byte) 0xE3, (byte) 0xE4, (byte) 0xE5, (byte) 0xE6, (byte) 0xE7, (byte) 0xE8, (byte) 0xE9, (byte) 0xEA, (byte) 0xEB, (byte) 0xEC, (byte) 0xED, (byte) 0xEE, (byte) 0xEF,
                 (byte) 0xF0, (byte) 0xF1, (byte) 0xF2, (byte) 0xF3, (byte) 0xF4, (byte) 0xF5, (byte) 0xF6, (byte) 0xF7, (byte) 0xF8, (byte) 0xF9, (byte) 0xFA, (byte) 0xFB, (byte) 0xFC, (byte) 0xFD, (byte) 0xFE, (byte) 0xFF
-            });
-            this.printerConnection.write(new byte[]{EscPosPrinterCommands.LF, EscPosPrinterCommands.LF, EscPosPrinterCommands.LF, EscPosPrinterCommands.LF});
-            this.printerConnection.send();
-        } catch (EscPosConnectionException e) {
-            e.printStackTrace();
-        }
+        });
+        this.printerConnection.write(new byte[]{EscPosPrinterCommands.LF, EscPosPrinterCommands.LF, EscPosPrinterCommands.LF, EscPosPrinterCommands.LF});
+        this.printerConnection.send();
+
         return this;
     }
 
@@ -581,7 +578,7 @@ public class EscPosPrinterCommands {
      * @param image Bytes contain the image in ESC/POS command
      * @return Fluent interface
      */
-    public EscPosPrinterCommands printImage(byte[] image) throws EscPosConnectionException {
+    public EscPosPrinterCommands printImage(byte[] image) throws IOException, InterruptedException {
         if (!this.printerConnection.isConnected()) {
             return this;
         }
@@ -678,7 +675,7 @@ public class EscPosPrinterCommands {
      *
      * @return Fluent interface
      */
-    public EscPosPrinterCommands newLine() throws EscPosConnectionException {
+    public EscPosPrinterCommands newLine() throws IOException, InterruptedException {
         return this.newLine(null);
     }
 
@@ -688,7 +685,7 @@ public class EscPosPrinterCommands {
      * @param align Set the alignment of text and barcodes. Use EscPosPrinterCommands.TEXT_ALIGN_... constants
      * @return Fluent interface
      */
-    public EscPosPrinterCommands newLine(byte[] align) throws EscPosConnectionException {
+    public EscPosPrinterCommands newLine(byte[] align) throws IOException, InterruptedException {
         if (!this.printerConnection.isConnected()) {
             return this;
         }
@@ -708,7 +705,7 @@ public class EscPosPrinterCommands {
      * @param dots Number of dots to feed (0 <= dots <= 255)
      * @return Fluent interface
      */
-    public EscPosPrinterCommands feedPaper(int dots) throws EscPosConnectionException {
+    public EscPosPrinterCommands feedPaper(int dots) throws IOException, InterruptedException {
         if (!this.printerConnection.isConnected()) {
             return this;
         }
@@ -726,7 +723,7 @@ public class EscPosPrinterCommands {
      *
      * @return Fluent interface
      */
-    public EscPosPrinterCommands cutPaper() throws EscPosConnectionException {
+    public EscPosPrinterCommands cutPaper() throws IOException, InterruptedException {
         if (!this.printerConnection.isConnected()) {
             return this;
         }
@@ -741,7 +738,7 @@ public class EscPosPrinterCommands {
      *
      * @return Fluent interface
      */
-    public EscPosPrinterCommands openCashBox() throws EscPosConnectionException {
+    public EscPosPrinterCommands openCashBox() throws IOException, InterruptedException {
         if (!this.printerConnection.isConnected()) {
             return this;
         }

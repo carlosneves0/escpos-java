@@ -9,10 +9,10 @@ import com.dantsu.escposprinter.EscPosCharsetEncoding;
 import com.dantsu.escposprinter.EscPosPrinter;
 import com.dantsu.escposprinter.connection.DeviceConnection;
 import com.dantsu.escposprinter.exceptions.EscPosBarcodeException;
-import com.dantsu.escposprinter.exceptions.EscPosConnectionException;
 import com.dantsu.escposprinter.exceptions.EscPosEncodingException;
 import com.dantsu.escposprinter.exceptions.EscPosParserException;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 public abstract class AsyncEscPosPrint extends AsyncTask<AsyncEscPosPrinter, Integer, AsyncEscPosPrint.PrinterStatus> {
@@ -79,9 +79,6 @@ public abstract class AsyncEscPosPrint extends AsyncTask<AsyncEscPosPrinter, Int
 
             this.publishProgress(AsyncEscPosPrint.PROGRESS_PRINTED);
 
-        } catch (EscPosConnectionException e) {
-            e.printStackTrace();
-            return new PrinterStatus(printerData, AsyncEscPosPrint.FINISH_PRINTER_DISCONNECTED);
         } catch (EscPosParserException e) {
             e.printStackTrace();
             return new PrinterStatus(printerData, AsyncEscPosPrint.FINISH_PARSER_ERROR);
@@ -91,7 +88,7 @@ public abstract class AsyncEscPosPrint extends AsyncTask<AsyncEscPosPrinter, Int
         } catch (EscPosBarcodeException e) {
             e.printStackTrace();
             return new PrinterStatus(printerData, AsyncEscPosPrint.FINISH_BARCODE_ERROR);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
         return new PrinterStatus(printerData, AsyncEscPosPrint.FINISH_SUCCESS);

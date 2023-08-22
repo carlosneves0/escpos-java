@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothSocket;
 import android.os.ParcelUuid;
 
 import com.dantsu.escposprinter.connection.DeviceConnection;
-import com.dantsu.escposprinter.exceptions.EscPosConnectionException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -53,13 +52,13 @@ public class BluetoothConnection extends DeviceConnection {
      * Start socket connection with the bluetooth device.
      */
     @SuppressLint("MissingPermission")
-    public BluetoothConnection connect() throws EscPosConnectionException {
+    public BluetoothConnection connect() throws IOException {
         if (this.isConnected()) {
             return this;
         }
 
         if (this.device == null) {
-            throw new EscPosConnectionException("Bluetooth device is not connected.");
+            throw new IOException("Null bluetooth device");
         }
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -72,10 +71,9 @@ public class BluetoothConnection extends DeviceConnection {
             this.socket.connect();
             this.outputStream = this.socket.getOutputStream();
             this.data = new byte[0];
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
             this.disconnect();
-            throw new EscPosConnectionException("Unable to connect to bluetooth device.");
+            throw exception;
         }
         return this;
     }

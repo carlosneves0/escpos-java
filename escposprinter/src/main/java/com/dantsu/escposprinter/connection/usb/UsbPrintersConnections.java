@@ -6,8 +6,6 @@ import android.hardware.usb.UsbDevice;
 
 import androidx.annotation.Nullable;
 
-import com.dantsu.escposprinter.exceptions.EscPosConnectionException;
-
 public class UsbPrintersConnections extends UsbConnections {
 
     /**

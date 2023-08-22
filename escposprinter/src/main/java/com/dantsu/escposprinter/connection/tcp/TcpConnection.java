@@ -1,13 +1,11 @@
 package com.dantsu.escposprinter.connection.tcp;
 
 import com.dantsu.escposprinter.connection.DeviceConnection;
-import com.dantsu.escposprinter.exceptions.EscPosConnectionException;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 
 public class TcpConnection extends DeviceConnection {
     private Socket socket = null;
@@ -54,7 +52,7 @@ public class TcpConnection extends DeviceConnection {
     /**
      * Start socket connection with the TCP device.
      */
-    public TcpConnection connect() throws EscPosConnectionException {
+    public TcpConnection connect() throws IOException {
         if (this.isConnected()) {
             return this;
         }
@@ -63,10 +61,9 @@ public class TcpConnection extends DeviceConnection {
             this.socket.connect(new InetSocketAddress(InetAddress.getByName(this.address), this.port), this.timeout);
             this.outputStream = this.socket.getOutputStream();
             this.data = new byte[0];
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
             this.disconnect();
-            throw new EscPosConnectionException("Unable to connect to TCP device.");
+            throw exception;
         }
         return this;
     }

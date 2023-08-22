@@ -4,7 +4,8 @@ import android.content.Context;
 
 import com.dantsu.escposprinter.connection.DeviceConnection;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
-import com.dantsu.escposprinter.exceptions.EscPosConnectionException;
+
+import java.io.IOException;
 
 public class AsyncBluetoothEscPosPrint extends AsyncEscPosPrint {
     public AsyncBluetoothEscPosPrint(Context context) {
@@ -36,7 +37,7 @@ public class AsyncBluetoothEscPosPrint extends AsyncEscPosPrint {
         } else {
             try {
                 deviceConnection.connect();
-            } catch (EscPosConnectionException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

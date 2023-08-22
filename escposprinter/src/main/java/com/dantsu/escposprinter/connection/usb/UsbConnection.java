@@ -4,7 +4,6 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 
 import com.dantsu.escposprinter.connection.DeviceConnection;
-import com.dantsu.escposprinter.exceptions.EscPosConnectionException;
 
 import java.io.IOException;
 
@@ -37,7 +36,7 @@ public class UsbConnection extends DeviceConnection {
     /**
      * Start socket connection with the usbDevice.
      */
-    public UsbConnection connect() throws EscPosConnectionException {
+    public UsbConnection connect() throws IOException {
         if (this.isConnected()) {
             return this;
         }
@@ -45,10 +44,9 @@ public class UsbConnection extends DeviceConnection {
         try {
             this.outputStream = new UsbOutputStream(this.usbManager, this.usbDevice);
             this.data = new byte[0];
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
             this.outputStream = null;
-            throw new EscPosConnectionException("Unable to connect to USB device.");
+            throw exception;
         }
         return this;
     }
@@ -72,19 +70,14 @@ public class UsbConnection extends DeviceConnection {
     /**
      * Send data to the device.
      */
-    public void send() throws EscPosConnectionException {
+    public void send() throws IOException {
         this.send(0);
     }
     /**
      * Send data to the device.
      */
-    public void send(int addWaitingTime) throws EscPosConnectionException {
-        try {
-            this.outputStream.write(this.data);
-            this.data = new byte[0];
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new EscPosConnectionException(e.getMessage());
-        }
+    public void send(int addWaitingTime) throws IOException {
+        this.outputStream.write(this.data);
+        this.data = new byte[0];
     }
 }
